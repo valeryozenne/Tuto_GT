@@ -6,30 +6,36 @@ Schedule : June 11, 2020 | 16:00-17:00
 
 Speaker: Valéry Ozenne
 
-## Summary
+# Summary
 
  - [Avant propos ?](#	-)
- - [Sequence and Data](#comment-fonctionne-git)
- - [Objectives](#sécurité)
- - [A typical Python Gadget](#inscription)
- - [My first Python Gadget](#créer-un-projet)
-   - [Structure des dossiers](#fourcher-forker-un-projet)
-   - [Ecrire le premier gadget](#gestion-des-fichiers)
-   - [Compiler et installer les changements](#demandes-de-fusion)
+ - [Comment fonctionne GIT](#comment-fonctionne-git)
+ - [Sécurité](#sécurité)
+ - [Inscription GitLab](#inscription)
+ - [Créer un projet](#créer-un-projet)
+ - [Fourcher (forker) un projet](#fourcher-forker-un-projet)
+ - [Gestion des fichiers](#gestion-des-fichiers)
+ - [Demandes de fusion](#demandes-de-fusion)
  - [Le format Markdown](#am%C3%A9liorer-ses-textes-avec-le-format-markdown)
  - [Gestion des issues](#les-issues)
  - [FAQ](#faq)
  - [Liens](#liens)
  - [Glossaire](#glossaire)
 
-## Avant propos
+# Avant propos
 
 Pourquoi les pythons gadgets. 
 
 Gadgetron : atout majeur : recosntruction en ligne , intégrable sur les machines Siemens et GE. Facilité de prototypage et de déploiement pour des études multi-centriques , imagerie interventionnelle. 
 
 
-## Sequence and Data
+
+
+
+
+
+
+# Sequence and Data
 
 Nous allons utiliser des acquisitions provenant de la séquence SMS du CMRR: https://www.cmrr.umn.edu/multiband/ acquises sur une Prisma Siemens 3T.
 
@@ -41,7 +47,7 @@ Les données sont disponibles à ce [lien](https://zenodo.org/), elles contient:
 
 Les données ont été converties avec siemens_to_ismrmrd, nous n'aborderons pas ici la conversion des données. Ce sera l'object des lectures suivantes. 
 
-## Objectives
+## Objectives of the tuos de ce tutorial
 
 - se familiariser avec le pipeline de reconstruction cartesienne
 - créer des nouveaux gadgets python
@@ -50,7 +56,7 @@ Les données ont été converties avec siemens_to_ismrmrd, nous n'aborderons pas
 - appeler sigpy depuis un gadget python
 
 
-## 1) A typical Python Gadget
+## 1) Un gadget python typique
 
 Les structures de données dans le gadgetron varie lors de la reconstruction. Les structures courantes sont au nombre de 4:
 
@@ -98,7 +104,7 @@ class MyFirstPythonGadget(Gadget):
     Elle peut ou non intéragir avec les informations contenu dans le message.
  
 
-## Mon premier gadget python
+## 2) Mon premier gadget python
 
 ### Structure des dossiers
 
@@ -134,7 +140,7 @@ Le repertoire de travail est le suivant: ${GT_SOURCE_FOLDER}/gadgets/python/lega
 
 
 
-### Ecrire le premier gadget
+### 2) Ecrire le premier gadget
 
 Dans `${GT_SOURCE_FOLDER}/gadgets/python/legacy/gadgets/`, créer le fichier my_first_python_gadget.py puis copier la classe précédente.
 Il est cependant nécessaire de modifier un élément qui est le message, ici on reçoit en fait deux messages en même temps. 
