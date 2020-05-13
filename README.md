@@ -8,19 +8,19 @@ Speaker: Valéry Ozenne
 
 ## Summary
 
- - [Avant propos ?](#avant-propos)
+ - [Avant propos](#avant-propos)
  - [Sequence and Data](#sequence-and-data)
  - [Objectives](#objectives)
  - [A typical Python Gadget](#a-typical-python-gadget)
- - [My first Python Gadget](#mon-premier-gadget-python)
+ - [My first Python Gadget](#my-first-python-gadget)
    - [Folder structure](#folder-structure)
-   - [Ecrire le premier gadget](#ecrire-le-premier-gadget)
-   - [Compiler et installer les changements](#demandes-de-fusion)
-   - [Lancer la reco et regarder le résultat](#demandes-de-fusion)
-   - [Exercice 1 : compter le nombre de readout](#demandes-de-fusion)
-   - [Exercice 2 : afficher la taille de matrice](#demandes-de-fusion)
-   - [Exercice 3 : afficher les informations du header](#demandes-de-fusion)
-   - [Exercice 4 : Suppression de readout et affichage de l'encodage](#demandes-de-fusion)
+   - [Writing the gadget](#writing-the-gadget)
+   - [Compilation and installation](#compilation-and-installation)
+   - [Reconstruction and visualisation](#demandes-de-fusion)
+   - [Exercice 1 : find the number of readout](#exercice -1 : find-the-number-of-readout)
+   - [Exercice 2 : display the matrix size](#demandes-de-fusion)
+   - [Exercice 3 : display the AcquisitionHeader](#demandes-de-fusion)
+   - [Exercice 4 : readout selection and corresponding encoding space](#demandes-de-fusion)
    - [Exercice 5 : Buffering](#buffering)
    - [Exercice 6 : Fourier Transform](#exercice-6-:-fourier-transform)
    - [First conclusion](#first-conclusion)
@@ -45,28 +45,28 @@ Gadgetron : atout majeur : recosntruction en ligne , intégrable sur les machine
 
 ## Sequence and Data
 
-Nous allons utiliser des acquisitions provenant de la séquence SMS du CMRR: https://www.cmrr.umn.edu/multiband/ acquises sur une Prisma Siemens 3T.
+We will use acquisitions from the SMS sequence of the CMRR: https://www.cmrr.umn.edu/multiband/ acquired on a 3T Prisma from Siemens.
 
-Les données sont disponibles à ce [lien](https://zenodo.org/), elles contient:
+Data is available at this [link](https://zenodo.org/):
 
 - acquisition single-shot grandient EPI, 12 slices, 3 repetitions, in-plane acceleration none, slice acceleration none   
 - acquisition single-shot grandient EPI, 12 slices, 3 repetitions, in-plane acceleration 2, slice acceleration none  
 - acquisition single-shot grandient EPI, 12 slices, 3 repetitions, in-plane acceleration 2, slice acceleration 2 
 
-Les données ont été converties avec siemens_to_ismrmrd, nous n'aborderons pas ici la conversion des données. Ce sera l'object des lectures suivantes. 
+The data has been converted with siemens_to_ismrmrd, we will not discuss data conversion here. This will be the object of the following readings.
 
 ## Objectives
 
-- se familiariser avec le pipeline de reconstruction cartesienne
-- créer des nouveaux gadgets python
-- manipuler les données kspace et image
-- appeler bart depuis un gadget python
-- appeler sigpy depuis un gadget python
+- to become familiar with the Cartesian reconstruction pipeline
+- to create new python gadget from scratch
+- to create a new xml configuration file 
+- data manipulation (readout, kspace, image)
+- to call BART from a python gagdet
+- to call SigPy from a python gagdet
 
 
 ## A typical Python Gadget
 
-Les structures de données dans le gadgetron varie lors de la reconstruction. Les structures courantes sont au nombre de 4:
 
 ```python
 import sys
@@ -78,9 +78,7 @@ from gadgetron import Gadget
 class MyFirstPythonGadget(Gadget):
     def __init__(self,next_gadget=None):
         super(MyFirstPythonGadget,self).__init__(next_gadget=next_gadget)
-        self.my_value = 0
-        self.my_list = []
-	self.my_matrix =[]
+        pass        
 
     def process_config(self, conf):
         # do allocation        
@@ -98,21 +96,24 @@ class MyFirstPythonGadget(Gadget):
 
 ```
 
-* init 
-    cf python
+* __init__ 
+
+    I quote Google: "**__init__** is a reseved method in python classes. It is called as a constructor in object oriented terminology. 
+    This method is called when an object is created from a class and it allows the class to initialize the attributes of the class."
 
 * process_config()
  
-    Fonction chargée de lire le flexible header: information général spécifique à la séquence , toujours quelque soit les readouts
-    Cette fonction n'est appelé qu'une seule fois au départ et sert généralement à l'allocation et à l'initialisation.
+    This function is called only once at the start and is generally used for allocation and initialization.
+    Function responsible for reading the **FlexibleHeader** (**ISMRMRDHeader**) which contains general information specific to the acquisition and therefore identical whatever the readouts
+    
 
 * process()
-
-    Fonction chargée de recevoir tous les messages provenant du gadget précédent et à pour mission d'envoyer un nouveau message au gadget suivant. 
-    Elle peut ou non intéragir avec les informations contenu dans le message.
+    
+    Function responsible for receiving all messages from the previous gadget and for sending a new message to the next gadget.
+    It may or may not interact with the information contained in the message.
  
 
-## Mon premier gadget python
+## My first Python Gadget
 
 ### Folder structure
 
@@ -148,7 +149,7 @@ Le repertoire de travail est le suivant: ${GT_SOURCE_FOLDER}/gadgets/python/lega
 
 
 
-### Ecrire le premier gadget
+### Writing the gadget
 
 Dans `${GT_SOURCE_FOLDER}/gadgets/python/legacy/gadgets/`, créer le fichier my_first_python_gadget.py puis copier la classe précédente.
 Il est cependant nécessaire de modifier un élément qui est le message, ici on reçoit en fait deux messages en même temps. 
@@ -229,7 +230,7 @@ sudo make install
 gadgetron
 ```
 
-### Lancer la reco et regarder le résultat
+### Reconstruction and visualisation
 
 Lancer la commande suivante pour effectuer la reconstruction après avoir redémarrer le Gadgetron
 
@@ -248,7 +249,7 @@ Utiliser le script python pour les lire et afficher les images
 ```
 
 
-### Exercice 1 : compter le nombre de readout
+### Exercice 1 : find the number of readout
 
 Ajouter les lignes suivantes dans la fonction process.
 
@@ -259,7 +260,7 @@ print(self.counter)
 
 Puis rejouer l'étape compilation et installation et lancer la reco.
 
-### Exercice 2 : afficher la taille de matrice
+### Exercice 2 : display the matrix size
 
 Ajouter les lignes suivantes dans la fonction process et import numpy as np en entête
 
@@ -269,7 +270,7 @@ print(np.shape(data))
 
 Puis rejouer l'étape compilation et installation et lancer la reco.
 
-### Exercice 3 : afficher les informations du header
+### Exercice 3 : display the AcquisitionHeader
 
 Ajouter les lignes suivantes
 
@@ -317,7 +318,7 @@ user_int: 0, 0, 0, 0, 0, 0, 0, 0
 user_float: 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
 ```
 
-### Exercice 4 : Suppression de readout et affichage de l'encodage
+### Exercice 4 : readout selection and corresponding encoding space
 
 Récupérer le numero de repetition et de slice avec les lignes suivantes:
 
@@ -340,7 +341,7 @@ Ajouter un second compteur nommé self.counter_send qui s'incrémente dans cette
 
 
 
-### Exercice 5 : Buffer
+### Exercice 5 : Buffering
 
 self.myBuffer = None
 
@@ -400,13 +401,13 @@ TODO: installation sans GPU / avec GPU
 
 ## A brief description of the class used to store readout, kspace or image data
 
-It is important to differenciate, the class :
+The data structures in the gadgetron vary during reconstruction. It is important to differenciate, the class or common structures 
 
 * used to store a unit of readout that would feed into a buffer
 * used to store a unit of data that would feed into a reconstruction
 * used to store an array of reconstructed data
 
-Each of them are defined in a C++ and have equivalent in Python
+Each of them are defined in a C++ and have equivalent in Python. Additionnal structure are also present and you can create new one
 
 ### Readout
 
