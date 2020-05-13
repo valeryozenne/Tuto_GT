@@ -117,9 +117,9 @@ class MyFirstPythonGadget(Gadget):
 
 ### Folder structure
 
-Nous allons modifier les sources du Gadgetron et ajouter à la fois des nouveaux gadgets et des nouveaux pipelines de reconstruction qui appelleront ces gadgets.
+We are going to modify the sources of the Gadgetron and add both new gadgets and new reconstruction pipelines that will call these gadgets.
 
-Le repertoire de travail est le suivant: ${GT_SOURCE_FOLDER}/gadgets/python/legacy/ qui contient un dossier `config/` avec les fichies .xml et un dossier `gadgets/` avec les gadgets python 
+The working directory is as follows: ${GT_SOURCE_FOLDER}/gadgets/python/legacy/ which contains a `config/` folder with .xml files and a `gadgets/` folder with the Python Gadget 
 
 ```bash
 
@@ -151,31 +151,32 @@ Le repertoire de travail est le suivant: ${GT_SOURCE_FOLDER}/gadgets/python/lega
 
 ### Writing the gadget
 
-Dans `${GT_SOURCE_FOLDER}/gadgets/python/legacy/gadgets/`, créer le fichier my_first_python_gadget.py puis copier la classe précédente.
-Il est cependant nécessaire de modifier un élément qui est le message, ici on reçoit en fait deux messages en même temps. 
-* Un header appelé **AcquisitionHeader** et noté **header** qui contient en autre les informations d'encodage spatial 
-* Des données sous forme matricielle en complex float notée **data** , la dimension de matrice est [RO, CHA] (readout size, channel number)
+In `${GT_SOURCE_FOLDER}/gadgets/python/legacy/gadgets/`, create the file my_first_python_gadget.py then copy the previous class.
+It is however necessary to modify an element which is the message, here we actually receive two messages at the same time.
+
+* A header called **AcquisitionHeader** and noted **Header** which also contains spatial encoding information.
+* A matrix of data which is a  **hoNDArray< std::complex<float> >** in C++ and a **numpy.ndarray** in Python and noted **data** , the data size is [RO, CHA] (readout size, number of channel).
  
 ```
 process(self, message):
-#devient
+#become
 process(self, head, data):
 ```
 
 ```
 self.put_next(message):
-#devient
+#become
 self.put_next(head, data):
 ```
 
 ```
-On peut ajouter le message suivant dans la fonction process pour vérifier que l'on passe bien dedans
+We can add the following message in the process function to verify that we are going through it.
 print("so far, so good")
 ```
 
 ### Compilation and installation
 
-Nous allons premièrement créer un nouveau fichier xml nommé python_passthrough_tutorial.xml.
+We will now create a new xml file named python_passthrough_tutorial.xml.
 
 ```
 
@@ -202,8 +203,7 @@ Nous allons premièrement créer un nouveau fichier xml nommé python_passthroug
 </gadgetronStreamConfiguration>
 ```
 
-
-Pour appeler notre gadget, nous devons l'ajouter à la chaine de reconstruction qui est actuellement vide. Pour cela ajouter les lignes suivantes après le ``MRIImageWriter``
+To call our gadget, we have to add it to the reconstruction chain which is currently empty. For this add the following lines after the `` MRIImageWriter``
 
 ```
 <gadget>
@@ -216,9 +216,9 @@ Pour appeler notre gadget, nous devons l'ajouter à la chaine de reconstruction 
 </gadget>
 ```
 
-Dans le CMakeLists.txt, dans la partie `set(gadgetron_python_config_files` ajouter la ligne : `config/python_passthrough_tutorial.xml`
+Dans le CMakeLists.txt, dans la partie `set(gadgetron_python_config_files` add the line : `config/python_passthrough_tutorial.xml`
 
-et ajouter dans la partie `set(gadgetron_python_gadgets_files`, ajouter lal ligne suviante: `gadgets/my_first_python_gadget.py`
+et ajouter dans la partie `set(gadgetron_python_gadgets_files`, add the following line: `gadgets/my_first_python_gadget.py`
 
 Il nous faut maintenant compiler le Gadgetron
 
