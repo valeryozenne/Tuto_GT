@@ -8,19 +8,33 @@ Speaker: Valéry Ozenne
 
 ## Summary
 
- - [Avant propos ?](#	-)
- - [Sequence and Data](#comment-fonctionne-git)
- - [Objectives](#sécurité)
- - [A typical Python Gadget](#inscription)
- - [My first Python Gadget](#créer-un-projet)
-   - [Structure des dossiers](#fourcher-forker-un-projet)
-   - [Ecrire le premier gadget](#gestion-des-fichiers)
+ - [Avant propos ?](#avant-propos)
+ - [Sequence and Data](#sequence-and-data)
+ - [Objectives](#objectives)
+ - [A typical Python Gadget](#a-typical-python-gadget)
+ - [My first Python Gadget](#mon-premier-gadget-python)
+   - [Folder structure](#folder-structure)
+   - [Ecrire le premier gadget](#ecrire-le-premier-gadget)
    - [Compiler et installer les changements](#demandes-de-fusion)
- - [Le format Markdown](#am%C3%A9liorer-ses-textes-avec-le-format-markdown)
- - [Gestion des issues](#les-issues)
- - [FAQ](#faq)
- - [Liens](#liens)
- - [Glossaire](#glossaire)
+   - [Lancer la reco et regarder le résultat](#demandes-de-fusion)
+   - [Exercice 1 : compter le nombre de readout](#demandes-de-fusion)
+   - [Exercice 2 : afficher la taille de matrice](#demandes-de-fusion)
+   - [Exercice 3 : afficher les informations du header](#demandes-de-fusion)
+   - [Exercice 4 : Suppression de readout et affichage de l'encodage](#demandes-de-fusion)
+   - [Exercice 5 : Buffering](#buffering)
+   - [Exercice 6 : Fourier Transform](#exercice-6-:-fourier-transform)
+   - [First conclusion](#first-conclusion)
+ - [A brief description of the class used to store readout, kspace or image data](#)
+    - [Readout](#les-issues)
+    - [Kspace](#faq)
+    - [Image](#liens)
+ - [My First Data Buffered Gadget](#glossaire)
+    - [Writing the Buffered Gadget](#les-issues)
+    - [Compilation, Installation and launching the reco](#faq)
+    - [Exercice 1: Fourier Transform using imsmrmrd-python-tool](#liens)
+    - [Exercice 2: Fourier Transform using BART](#liens)
+    - [Exercice 3: Fourier Transform using Sigpy](#liens)
+    - [Exercice 4: Grappa reconstruction using PyGrappa](#liens)
 
 ## Avant propos
 
@@ -50,7 +64,7 @@ Les données ont été converties avec siemens_to_ismrmrd, nous n'aborderons pas
 - appeler sigpy depuis un gadget python
 
 
-## 1) A typical Python Gadget
+## A typical Python Gadget
 
 Les structures de données dans le gadgetron varie lors de la reconstruction. Les structures courantes sont au nombre de 4:
 
@@ -100,7 +114,7 @@ class MyFirstPythonGadget(Gadget):
 
 ## Mon premier gadget python
 
-### Structure des dossiers
+### Folder structure
 
 Nous allons modifier les sources du Gadgetron et ajouter à la fois des nouveaux gadgets et des nouveaux pipelines de reconstruction qui appelleront ces gadgets.
 
@@ -158,7 +172,7 @@ On peut ajouter le message suivant dans la fonction process pour vérifier que l
 print("so far, so good")
 ```
 
-### Compiler et installer les changements
+### Compilation and installation
 
 Nous allons premièrement créer un nouveau fichier xml nommé python_passthrough_tutorial.xml.
 
@@ -351,18 +365,19 @@ if self.myBuffer is None:
 self.myBuffer[:,e1,:] = data
 ```
 
-### Exercice 6 : transformée de Fourier et imprimer le resultat
+### Exercice 6 : Fourier Transform
 
-
+```
 from matplotlib import transform
 from ismrmrdtools import transform
+
 
 if (e1==96)
     plt.figure(1)    
     plt.imshow(np.abs(self.myBuffer[:,:,0]))
-    
+``` 
 
-### Conclusion : 
+### First Conclusion
 
 Pas forcément nécessaire de tout redévelopper
 
@@ -383,25 +398,33 @@ TODO: installation sans GPU / avec GPU
 
 
 
-## Pour aller plus loin
+## A brief description of the class used to store readout, kspace or image data
 
+It is important to differenciate, the class :
 
+* used to store a unit of readout that would feed into a buffer
+* used to store a unit of data that would feed into a reconstruction
+* used to store an array of reconstructed data
 
+Each of them are defined in a C++ and have equivalent in Python
 
+### Readout
 
-### readout
+Le gadget python recevra deux messages associés qui contiennent le **AcquisitionHeader** et les données sous forme de matrice **hoNDArray< std::complex<float> >**.
+En python le **hoNDArray** est la matrice multidimensionnel **ndarray** issue de la librairie numpy 
 
-Le gadgetron reçoit
-
-
-Le gadget python correspondant recevra deux messages associés qui contiennent le AcquisitionHeader et les données sous forme de matrice 
 ``` 
 process(self, header, data):
 
-
 ```
 
-### kspace
+```
+print(type(header))
+
+print(type(data))
+```
+
+### Kspace
 
 En imagerie cartesienne, deux gadgets jouent un role fondamental : AcquisitionAccumulateTriggerGadget et BucketToBufferGadget. 
 
@@ -492,7 +515,10 @@ struct IsmrmrdDataBuffered
 ```
 
 
+### Image
 
+
+### Writing the Buffered Gadget
 
 Nous allons donc maintenant créer un nouveau gadget nommé MyFirstDataBufferedGadget.
 
@@ -529,17 +555,12 @@ class MyFirstDataBufferedGadget(Gadget):
 ```
 
 
-### image
+### Compilation, Installation and launching the reco
+### Exercice 1: Fourier Transform using imsmrmrd-python-tool
+### [Exercice 2: Fourier Transform using BART
+### Exercice 3: Fourier Transform using Sigpy
+### Exercice 4: Grappa reconstruction using PyGrappa
 
-### image
-
-
-
-
-
-
-
-```
 
 
 
