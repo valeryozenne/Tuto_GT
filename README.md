@@ -53,8 +53,7 @@ To do the tutorial, you need to install two components:
 * gadgetron
 * python-gadgetron
 
-
-Detailed installation instructions have been summarized [here](Installation). But basically, on Ubuntu you need to run the following line:
+Detailed installation instructions have been summarized [here](https://github.com/gadgetron/GadgetronOnlineClass/tree/master/Installation). But basically, on Ubuntu you need to run the following line:
 
 ```
 sudo add-apt-repository ppa:gradient-software/experimental
@@ -65,28 +64,39 @@ sudo pip3 install gadgetron
 
 Optional
 
-```
-sudo pip3 install pygrappa
-sudo pip3 install sigpy
+The following programm will be used at the end of the tutorial. You can skip this part at the beginning.
+
+[ismrmrd-python-tools](https://github.com/ismrmrd/ismrmrd-python-tools)
 [sigpy](https://github.com/mikgroup/sigpy-mri-tutorial)
 [pygrappa](https://github.com/mckib2/pygrappa)
 [ismrmrdviewer](https://github.com/ismrmrd/ismrmrdviewer)
-# an alternative
-[ismrmrd-viewer](https://github.com/DietrichBE/ismrmrd-viewer)
-[ismrmrd-python-tools](https://github.com/ismrmrd/ismrmrd-python-tools)
-# and BART
+[ismrmrd-viewer](https://github.com/DietrichBE/ismrmrd-viewer)  (an alternative)
 [BART](https://github.com/mrirecon/bart)
+
+You can install them using **pip3 install** or using the command **python3 setup.py install** after downloading the source. Nevertheless somes dependencies must be satisfied.
+
 ```
+git clone https://github.com/ismrmrd/ismrmrd-python-tools.git
+cd ismrmrd-python-tools
+sudo python3 setup.py install
+```   
+
+```
+sudo pip3 install pygrappa
+sudo pip3 install sigpy
+```
+
 
 ## Sequence and Data
 
-We will use acquisitions from the SMS sequence of the CMRR: https://www.cmrr.umn.edu/multiband/ acquired on a 3T Prisma from Siemens.
+We will use single-shot gradient-echo EPI acquisitions from the [CMRR sequence](https://www.cmrr.umn.edu/multiband/) acquired on a 3T Prisma from Siemens.
 
 Data is available at this link [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3777994.svg)](https://doi.org/10.5281/zenodo.3777994):
 
-- acquisition single-shot grandient EPI, 12 slices, 3 repetitions, in-plane acceleration none, slice acceleration none   
-- acquisition single-shot grandient EPI, 12 slices, 3 repetitions, in-plane acceleration 2, slice acceleration none  
-- acquisition single-shot grandient EPI, 36 slices, 3 repetitions, in-plane acceleration 2, slice acceleration 2 
+Three datasets (including noise calibration and kspace) are available: 
+- phantom, 12 slices, 3 repetitions, in-plane acceleration none, slice acceleration none   
+- phantom, 12 slices, 3 repetitions, in-plane acceleration 2, slice acceleration none  
+- brain, 36 slices, 3 repetitions, in-plane acceleration 2, slice acceleration 2 
 
 The data has been converted with **siemens_to_ismrmrd**, we will not discuss data conversion here. This will be the object of the following readings.
 
@@ -99,119 +109,48 @@ The data has been converted with **siemens_to_ismrmrd**, we will not discuss dat
 - to call BART from a python gagdet
 - to call SigPy from a python gagdet
 
-
 ## A typical Python Gadget
 
 
 ```python
-import sys
+import numpy as np
+import gadgetron
 import ismrmrd
-import ismrmrd.xsd
 
-from gadgetron import Gadget
-
-class MyFirstPythonGadget(Gadget):
-    def __init__(self,next_gadget=None):
-        super(MyFirstPythonGadget,self).__init__(next_gadget=next_gadget)
-        pass        
-
-    def process_config(self, conf):
-        # do allocation        
-	pass 
-
-    def process(self, message):
-               
-	# get information from the message
-
-	# modify the message
-
-	# send the message to the next gadget
-        self.put_next(message)
-        return 0
+def EmptyPythonGadget(connection):
+   
+   for acquisition in connection:
+          
+       # DO SOMETHING     
+       connection.send(acquisition)
+  
 
 ```
-
-* __init__ 
-
-    I quote Google: "**__init__** is a reseved method in python classes. It is called as a constructor in object oriented terminology. 
-    This method is called when an object is created from a class and it allows the class to initialize the attributes of the class."
-
-* process_config()
- 
-    This function is called only once at the start and is generally used for allocation and initialization.
-    Function responsible for reading the **FlexibleHeader** (**ISMRMRDHeader**) which contains general information specific to the acquisition and therefore identical whatever the readouts
-    
-
-* process()
-    
-    Function responsible for receiving all messages from the previous gadget and for sending a new message to the next gadget.
-    It may or may not interact with the information contained in the message.
- 
+The function is responsible for receiving all messages from the previous gadget and for sending a new message to the next gadget using **connection.send()**
+It may or may not interact with the information contained in the message.  
 
 ## My first Python Gadget
 
-### Folder structure
+Create a new directory named `GT_Lecture3` and open two terminals at the location.
 
-We are going to modify the sources of the Gadgetron and add both new gadgets and new reconstruction pipelines that will call these gadgets.
-
-The working directory is as follows: ${GT_SOURCE_FOLDER}/gadgets/python/legacy/ which contains a `config/` folder with .xml files and a `gadgets/` folder with the Python Gadget 
-
-```bash
-
-├── CMakeLists.txt
-├── config
-│   └── Generic_Cartesian_Grappa_RealTimeCine_Python.xml
-└── legacy
-    ├── config
-    │   ├── pseudoreplica.xml
-    │   ├── python_buckets.xml
-    │   ├── python_image_array_recon.xml
-    │   ├── python_image_array.xml
-    │   ├── python_passthrough.xml
-    │   └── python_short.xml
-    └── gadgets
-        ├── accumulate_and_recon.py
-        ├── array_image.py
-        ├── bucket_recon.py
-        ├── image_array_recon.py
-        ├── image_array_recon_rtcine_plotting.py
-        ├── passthrough_array_image.py
-        ├── passthrough.py
-        ├── pseudoreplicagather.py
-        ├── remove_2x_oversampling.py
-        └── rms_coil_combine.py
 ```
-
-
+mkdir GT_Lecture3
+cd GT_Lecture3
+```
 
 ### Writing the gadget
 
-In `${GT_SOURCE_FOLDER}/gadgets/python/legacy/gadgets/`, create the file my_first_python_gadget.py then copy the previous class.
-It is however necessary to modify an element which is the message, here we actually receive two messages at the same time.
-
-* A header called **AcquisitionHeader** and noted **Header** which also contains spatial encoding information.
-* A matrix of data which is a  **hoNDArray< std::complex<float> >** in C++ and a **numpy.ndarray** in Python and noted **data** , the data size is [RO, CHA] (readout size, number of channel).
- 
-```
-process(self, message):
-#become
-process(self, head, data):
-```
+Create the file my_first_python_gadget.py then copy the previous class. 
 
 ```
-self.put_next(message):
-#become
-self.put_next(head, data):
-```
-
-```
-We can add the following message in the process function to verify that we are going through it.
+We can add the following message before connection.send() that we are going through it.
 print("so far, so good")
 ```
 
-### Compilation and installation
 
-We will now create a new xml file named python_passthrough_tutorial.xml.
+### Writing the XML chain 
+
+We will now create a new xml file named `external_python_tutorial.xml`. Add the following content into `external_python_tutorial.xml`
 
 ```
 
@@ -241,37 +180,35 @@ We will now create a new xml file named python_passthrough_tutorial.xml.
 To call our gadget, we have to add it to the reconstruction chain which is currently empty. For this add the following lines after the `` MRIImageWriter``
 
 ```
-<gadget>
-        <name>MyFirstPythonGadget</name>
-        <dll>gadgetron_python</dll>
-        <classname>PythonGadget</classname>
-        <property><name>python_path</name><value>/home/myuser/scripts/python</value></property>
-        <property><name>python_module</name><value>my_first_python_gadget</value></property>
-        <property><name>python_class</name><value>MyFirstPythonGadget</value></property>
-</gadget>
+<stream>  
+        <external>
+            <execute name="my_first_python_gadget" target="EmptyPythonGadget" type="python"/>
+            <configuration/>
+        </external> 
+</stream>
 ```
 
-Dans le CMakeLists.txt, dans la partie `set(gadgetron_python_config_files` add the line : `config/python_passthrough_tutorial.xml`
+## Compilation and installation 
 
-et ajouter dans la partie `set(gadgetron_python_gadgets_files`, add the following line: `gadgets/my_first_python_gadget.py`
-
-Il nous faut maintenant compiler le Gadgetron
-
-
-```bash
-cmake ../
-make 
-sudo make install
-gadgetron
-```
+Nothing to do.
 
 ### Reconstruction and visualisation
 
-Lancer la commande suivante pour effectuer la reconstruction après avoir redémarrer le Gadgetron
+To run the reconstruction chain, you'll need to run Gadgetron, and the Gadgetron ISMRMRD client. 
+
+Start Gadgetron:
+```bash
+$ gadgetron
+```
+
+Run the ISMRMRD client: 
+```bash 
+$ cd path/to/gadgetron/test/integration
+$ gadgetron_ismrmrd_client -f in.h5  -C external_python_tutorial.xml
+```
 
 ```
-rm out.h5
-gadgetron_ismrmrd_client -f     -c python_passthrough_tutorial.xml
+gadgetron_ismrmrd_client -f     -C python_passthrough_tutorial.xml
 
 ```
 
