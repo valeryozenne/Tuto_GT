@@ -8,8 +8,7 @@ Speaker: Valéry Ozenne
 
 ## Summary
 
- - [Foreword](#ferword)
- - [Installation](#installation)
+ - [Avant propos](#avant-propos)
  - [Sequence and Data](#sequence-and-data)
  - [Objectives](#objectives)
  - [A typical Python Gadget](#a-typical-python-gadget)
@@ -37,58 +36,24 @@ Speaker: Valéry Ozenne
     - [Exercice 3: Fourier Transform using Sigpy](#liens)
     - [Exercice 4: Grappa reconstruction using PyGrappa](#liens)
 
+## Avant propos
 
-## Foreword 
+Pourquoi les pythons gadgets. 
 
-The Gadgetron responds to two major issues in MRI:
-- prototyping: how to develop a new reconstruction and associate it with an existing or developing sequence.
-- deployment: how to deploy a sequence and reconstruction on several sites for a clinical study
+Gadgetron : atout majeur : recosntruction en ligne , intégrable sur les machines Siemens et GE. Facilité de prototypage et de déploiement pour des études multi-centriques , imagerie interventionnelle. 
 
-The Gadgetron also offers software flexibility (choice of language used) and hardware flexibility (choice of reconstruction hardware: from simple PC to Cloud). Specific aera of research impose constraints on reconstruction time or latency. Typically deployment on clinical sites or interventional imaging are two scenarios where the use of C ++ will be preferable. For most of the other thematics, languages ​​such as Python or Matlab are more accessible and particularly adapted to our computing problems (ex: matrix calculation, linear algebra). Addionnally, Python is quite popular in image processing (itk, vtk) and in machine learing (keras, tensor flow). 
-
-## Installation
-
-To do the tutorial, you need to install two components:
-
-* gadgetron
-* python-gadgetron
-
-
-Detailed installation instructions have been summarized [here](Installation). But basically, on Ubuntu you need to run the following line:
-
-```
-sudo add-apt-repository ppa:gradient-software/experimental
-sudo apt-get update
-sudo apt-get install gadgetron-all
-sudo pip3 install gadgetron
-```
-
-Optional
-
-```
-sudo pip3 install pygrappa
-sudo pip3 install sigpy
-[sigpy](https://github.com/mikgroup/sigpy-mri-tutorial)
-[pygrappa](https://github.com/mckib2/pygrappa)
-[ismrmrdviewer](https://github.com/ismrmrd/ismrmrdviewer)
-# an alternative
-[ismrmrd-viewer](https://github.com/DietrichBE/ismrmrd-viewer)
-[ismrmrd-python-tools](https://github.com/ismrmrd/ismrmrd-python-tools)
-# and BART
-[BART](https://github.com/mrirecon/bart)
-```
 
 ## Sequence and Data
 
 We will use acquisitions from the SMS sequence of the CMRR: https://www.cmrr.umn.edu/multiband/ acquired on a 3T Prisma from Siemens.
 
-Data is available at this link [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3777994.svg)](https://doi.org/10.5281/zenodo.3777994):
+Data is available at this [link](https://zenodo.org/):
 
 - acquisition single-shot grandient EPI, 12 slices, 3 repetitions, in-plane acceleration none, slice acceleration none   
 - acquisition single-shot grandient EPI, 12 slices, 3 repetitions, in-plane acceleration 2, slice acceleration none  
-- acquisition single-shot grandient EPI, 36 slices, 3 repetitions, in-plane acceleration 2, slice acceleration 2 
+- acquisition single-shot grandient EPI, 12 slices, 3 repetitions, in-plane acceleration 2, slice acceleration 2 
 
-The data has been converted with **siemens_to_ismrmrd**, we will not discuss data conversion here. This will be the object of the following readings.
+The data has been converted with siemens_to_ismrmrd, we will not discuss data conversion here. This will be the object of the following readings.
 
 ## Objectives
 
