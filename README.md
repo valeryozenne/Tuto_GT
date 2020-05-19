@@ -23,6 +23,7 @@ Speaker: Valéry Ozenne
    - [Exercice 3 : display the AcquisitionHeader](#demandes-de-fusion)
    - [Exercice 4 : readout selection and corresponding encoding space](#demandes-de-fusion)
    - [Exercice 5 : Buffering](#buffering)
+   - [Exercice 6 : Matplotlib and Ghost Niquist correction](#matplotlib-and-ghost niquist)
    - [Exercice 6 : Fourier Transform](#exercice-6-:-fourier-transform)
    - [First conclusion](#first-conclusion)
  - [A brief description of the class used to store readout, kspace or image data](#)
@@ -31,10 +32,10 @@ Speaker: Valéry Ozenne
     - [Image](#liens)
  - [My First Data Buffered Gadget](#glossaire)
     - [Writing the Buffered Gadget](#les-issues)
-    - [Compilation, Installation and launching the reco](#faq)
+    - [Compilation](#faq)
     - [Exercice 1: Fourier Transform using imsmrmrd-python-tool](#liens)
-    - [Exercice 2: Fourier Transform using BART](#liens)
-    - [Exercice 3: Fourier Transform using Sigpy](#liens)
+    - [Exercice 2: Fourier Transform using Sigpy](#liens)
+    - [Exercice 3: Fourier Transform using BART](#liens)
     - [Exercice 4: Grappa reconstruction using PyGrappa](#liens)
 
 
@@ -152,8 +153,7 @@ print("so far, so good")
 
 We will now create a new xml file named `external_python_tutorial.xml`. Add the following content into `external_python_tutorial.xml`
 
-```
-
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <gadgetronStreamConfiguration xsi:schemaLocation="http://gadgetron.sf.net/gadgetron gadgetron.xsd"
         xmlns="http://gadgetron.sf.net/gadgetron"
@@ -179,7 +179,7 @@ We will now create a new xml file named `external_python_tutorial.xml`. Add the 
 
 To call our gadget, we have to add it to the reconstruction chain which is currently empty. For this add the following lines after the `` MRIImageWriter``
 
-```
+```xml
 <stream>  
         <external>
             <execute name="my_first_python_gadget" target="EmptyPythonGadget" type="python"/>
@@ -188,13 +188,13 @@ To call our gadget, we have to add it to the reconstruction chain which is curre
 </stream>
 ```
 
-## Compilation and installation 
+### Compilation and installation 
 
 Nothing to do.
 
 ### Reconstruction and visualisation
 
-To run the reconstruction chain, you'll need to run Gadgetron, and the Gadgetron ISMRMRD client. 
+To run the reconstruction chain, you'll need to run Gadgetron, and the Gadgetron ISMRMRD client in two different terminal located in the same folder.
 
 Start Gadgetron:
 ```bash
@@ -203,172 +203,241 @@ $ gadgetron
 
 Run the ISMRMRD client: 
 ```bash 
-$ cd path/to/gadgetron/test/integration
-$ gadgetron_ismrmrd_client -f in.h5  -C external_python_tutorial.xml
+$ gadgetron_ismrmrd_client -f Data/meas_MID00026_FID49092_cmrr_12s_80p_MB0_GP0.h5  -C external_python_tutorial.xml
 ```
 
+You will see from the Gadgetron ISMRMRD client side :
+
+``` bash
+Gadgetron ISMRMRD client
+  -- host            :      localhost
+  -- port            :      9002
+  -- hdf5 file  in   :      /home/valery/DICOM/2017-09-14_IBIO/meas_MID00026_FID49092_cmrr_12s_80p_MB0_GP0.h5
+  -- hdf5 group in   :      /dataset
+  -- conf            :      default.xml
+  -- loop            :      1
+  -- hdf5 file out   :      out.h5
+  -- hdf5 group out  :      2020-05-19 15:44:55
+This measurement has dependent measurements
+  Noise : 16
+Querying the Gadgetron instance for the dependent measurement: 66056_63650129_63650134_16
 ```
-gadgetron_ismrmrd_client -f     -C python_passthrough_tutorial.xml
 
-```
 
-Les données sont écrites par défaut dans un fichier out.h5.
+You will see from the Gadgetron server side :
 
-Utiliser le script python pour les lire et afficher les images
-
-```
+``` bash
+gadgetron
+05-19 15:44:53.650 INFO [main.cpp:49] Gadgetron 4.1.1 [0c29a9433eb8dd93426ddc318f249d38af7b3d39]
+05-19 15:44:53.650 INFO [main.cpp:50] Running on port 9002
+05-19 15:44:53.650 INFO [Server.cpp:25] Gadgetron home directory: "/usr/local"
+05-19 15:44:53.650 INFO [Server.cpp:26] Gadgetron working directory: "/tmp/gadgetron/"
+05-19 15:44:55.499 INFO [Server.cpp:42] Accepted connection from: ::ffff:127.0.0.1
+05-19 15:44:55.499 INFO [ConfigConnection.cpp:113] Connection state: [CONFIG]
+05-19 15:44:55.501 INFO [HeaderConnection.cpp:82] Connection state: [HEADER]
+05-19 15:44:55.501 INFO [VoidConnection.cpp:38] Connection state: [VOID]
+05-19 15:44:55.502 DEBUG [Stream.cpp:52] Loading Gadget NoiseSummary of class NoiseSummaryGadget from 
+05-19 15:44:55.537 DEBUG [NoiseSummaryGadget.cpp:35] Noise dependency folder is /tmp/gadgetron/
+05-19 15:44:55.538 DEBUG [Gadget.h:130] Shutting down Gadget ()
+05-19 15:44:55.539 INFO [Core.cpp:76] Connection state: [FINISHED]
+05-19 15:44:55.540 INFO [Server.cpp:42] Accepted connection from: ::ffff:127.0.0.1
+05-19 15:44:55.544 INFO [ConfigConnection.cpp:113] Connection state: [CONFIG]
+05-19 15:44:55.558 INFO [HeaderConnection.cpp:82] Connection state: [HEADER]
+05-19 15:44:55.574 INFO [StreamConnection.cpp:75] Connection state: [STREAM]
+05-19 15:44:55.575 DEBUG [Stream.cpp:64] Loading External Execute block with name my_first_python_gadget of type python 
+05-19 15:44:55.597 INFO [External.cpp:69] Waiting for external module 'my_first_python_gadget' on port: 46825
+05-19 15:44:55.603 INFO [Python.cpp:31] Started external Python module (pid: 11056).
+/usr/lib/python3/dist-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+05-19 15:44:55.887 DEBUG [ext. 11056 my_first_python_gadget.EmptyPythonGadget] Starting external Python module 'my_first_python_gadget' in state: [ACTIVE]
+05-19 15:44:55.887 DEBUG [ext. 11056 my_first_python_gadget.EmptyPythonGadget] Connecting to parent on port 46825
+05-19 15:44:55.889 INFO [External.cpp:86] Connected to external module 'my_first_python_gadget' on port: 46825
+so far, so good
+so far, so good
+[...]
+so far, so good
+so far, so good
+05-19 15:44:58.966 DEBUG [ext. 11056 my_first_python_gadget.EmptyPythonGadget] Connection closed normally.
+05-19 15:44:59.011 INFO [Core.cpp:76] Connection state: [FINISHED]
 
 ```
 
 
 ### Exercice 1 : find the number of readout
 
-Ajouter les lignes suivantes dans la fonction process.
+Add the following lines, the initialisation must be before the loop
 
-```
-self.counter=self.counter+1;
-print(self.counter)
+```python
+counter=0
+counter=counter+1;
+print(counter)
 ```
 
-Puis rejouer l'étape compilation et installation et lancer la reco.
+Save the python file and launch the client.
 
 ### Exercice 2 : display the matrix size
 
-Ajouter les lignes suivantes dans la fonction process et import numpy as np en entête
+Add the following lines
 
 ```
-print(np.shape(data))
+import numpy as np
+print(np.shape(acquisition.data))
 ```
-
-Puis rejouer l'étape compilation et installation et lancer la reco.
 
 ### Exercice 3 : display the AcquisitionHeader
 
-Ajouter les lignes suivantes
+Add the following lines
 
-print(header)
-
-
-Nous allons obtenir ce type de message
-
+```python
+print(acquisition.active_channels)
+print(acquisition.scan_counter)
 ```
-2404
-(256, 12)
-version: 1
-flags: 2097152
-measurement_uid: 26
-scan_counter: 2404
-acquisition_time_stamp: 22684240
-physiology_time_stamp: 8545183, 0, 0
-number_of_samples: 256
-available_channels: 12
-active_channels: 12
-channel_mask: 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-discard_pre: 0
-discard_post: 0
-center_sample: 128
-encoding_space_ref: 0
-trajectory_dimensions: 0
-sample_time_us: 1.600000023841858
-position: 0.0, -4.842615127563477, -75.69005584716797
-read_dir: -6.123031769111886e-17, 1.0, 0.0
-phase_dir: 1.0, 6.123031769111886e-17, 0.0
-slice_dir: 0.0, 0.0, 1.0
-patient_table_position: 0.0, 0.0, -1259016.0
-idx: kspace_encode_step_1: 23
-kspace_encode_step_2: 0
-average: 0
-slice: 0
-contrast: 0
-phase: 0
-repetition: 2
-set: 0
-segment: 1
-user: 0, 0, 0, 0, 0, 32, 0, 0
 
-user_int: 0, 0, 0, 0, 0, 0, 0, 0
-user_float: 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-```
 
 ### Exercice 4 : readout selection and corresponding encoding space
 
-Récupérer le numero de repetition et de slice avec les lignes suivantes:
+Get the repetion number and slice number using the following lines:
 
-```
-slice = header.idx.slice
-repetition=  header.idx.repetition
-e1=header.idx.kspace_encode_step_1
-segment=header.idx.segment
-```
-
-Et ajouter la condition suivante pour ne pas transmettre tous les readouts des autres coupes et autres répétitions.
-
-```
-if (repetition>0 and slice>0):
-   print(self.counter_send, " slice: ",slice , " rep: ", repetition, " e1: ", e1," segment: ",  segment)
-    
+```python
+slice = acquisition.idx.slice
+repetition=  acquisition.idx.repetition
+e1=acquisition.idx.kspace_encode_step_1
+segment=acquisition.idx.segment
+print(counter, " slice: ",slice , " rep: ", repetition, " e1: ", e1," segment: ",  segment)
 ```
 
-Ajouter un second compteur nommé self.counter_send qui s'incrémente dans cette boucle.
+Now we can add a filter using the following command before the loop:
 
-
-
-### Exercice 5 : Buffering
-
-self.myBuffer = None
-
-self.enc = None
-
-Dans process config ajouter ceci pour récupérer la taille de la amtrice:
-
-self.header = ismrmrd.xsd.CreateFromDocument(conf)
-self.enc = self.header.encoding[0]
-
-
-```
-if self.myBuffer is None:
-     channels = acq.active_channels
-            
-     eNz = self.enc.encodedSpace.matrixSize.z
-     eNy = self.enc.encodedSpace.matrixSize.y
-     eNx = self.enc.encodedSpace.matrixSize.x
-        
-     self.myBuffer = np.zeros(( int(eNx),eNy,channels),dtype=np.complex64)
-
-self.myBuffer[:,e1,:] = data
+```python
+# We're only interested in repetition ==0  in this example, so we filter the connection. Anything filtered out in
+# this way will pass back to Gadgetron unchanged.
+connection.filter(lambda acq: acq.idx.repetition ==0)
 ```
 
-### Exercice 6 : Fourier Transform
+Increase the selection
+
+```python
+connection.filter(lambda acq: acq.idx.repetition ==2 and acq.idx.slice ==0)
+```
+
+Increase the selection
+```python 
+connection.filter(lambda acq: acq.idx.repetition ==2 and acq.idx.slice ==0 and acq.is_flag_set(ismrmrd.ACQ_IS_REVERSE))
+```
+
+Increase the selection
+```python 
+connection.filter(lambda acq: acq.idx.repetition ==2 and acq.idx.slice ==0 and acq.is_flag_set(ismrmrd.ACQ_IS_REVERSE) and acq.is_flag_set(ismrmrd.ACQ_IS_PARALLEL_CALIBRATION))
+```
+
+Pick then the dataset with ACS calibration and try again
+
+
+### Exercice 5 : Matplotlib & Ghost Niquist
+
+Copy and paste the previous function and call it EpiPythonGadget.
+
+Usign the connection filter, filter the data with the FLAGS:ACQ_IS_PHASECORR_DATA 
+Pick only the first slice, you will see 9 lines using the fully sampled dataset:
+
+```python
+ counter:  1  scan_counter:  2  slice:  0  rep:  0  e1:  32  segment:  1
+ counter:  2  scan_counter:  3  slice:  0  rep:  0  e1:  32  segment:  0
+ counter:  3  scan_counter:  4  slice:  0  rep:  0  e1:  32  segment:  1
+ counter:  4  scan_counter:  1190  slice:  0  rep:  1  e1:  32  segment:  1
+ counter:  5  scan_counter:  1191  slice:  0  rep:  1  e1:  32  segment:  0
+ counter:  6  scan_counter:  1192  slice:  0  rep:  1  e1:  32  segment:  1
+ counter:  7  scan_counter:  2378  slice:  0  rep:  2  e1:  32  segment:  1
+ counter:  8  scan_counter:  2379  slice:  0  rep:  2  e1:  32  segment:  0
+ counter:  9  scan_counter:  2380  slice:  0  rep:  2  e1:  32  segment:  1
+```
+
+Now, we would like to compare the magnitude and phase of the kspace using matplotlib.
+
+First set the import
+
+```python
+#import matplotlib
+#matplotlib.use('Qt4Agg')  
+import matplotlib.pyplot as plt
+```
+
+Then, pick the first channel.
 
 ```
-from matplotlib import transform
-from ismrmrdtools import transform
+fid=np.abs(np.squeeze(acquisition.data[0,:]))
+```
+
+and plot the data. The reverse line are plot in red and normal in blue 
+
+```python
+if (acquisition.is_flag_set(ismrmrd.ACQ_IS_REVERSE)):
+          plt.plot(fid, 'r')
+       else:
+          plt.plot(fid, 'b') 
+       if (counter%3==0):  
+          plt.show()
+          plt.pause(2)
+```
+
+Note that when you close the matplotlib window, the reco continue to the next plot.
+
+The lines are used to correct the Ghost-Niquist artefact (caused by gradient imperfection) by computing the phase difference between positive and negative readout after ifft in the readout direction. Such corrections has been implemented in C++ as well as the regridding. Please see Generic_Cartesian_Grappa_EPI.xml.
+
+### Exercice 6 : Buffering
+
+For the last exercice : copy and paste my_first_python_gadget.py into my_second_python_gadget.py
+
+In order to do the buffering, we need to first find the dimension of the ksapce and to allocate the matrix.
+The flexible header or **ISMRMRDHeader** include general information about the acquisition like **patientInformation**, **acquisitionSystemInformation** and **encoding** information.
+The ISMRMRD format will be explained in the next lectures.
 
 
-if (e1==96)
-    plt.figure(1)    
-    plt.imshow(np.abs(self.myBuffer[:,:,0]))
-``` 
+```python
+h=connection.header
+
+number_of_channels=h.acquisitionSystemInformation.receiverChannels   
+   
+encoding_space = h.encoding[0].encodedSpace
+              
+eNz = encoding_space.matrixSize.z
+eNy = encoding_space.matrixSize.y
+eNx = encoding_space.matrixSize.x
+
+encoding_limits = h.encoding[0].encodingLimits
+
+number_of_slices=encoding_limits.slice.maximum+1
+number_of_repetitions=encoding_limits.repetition.maximum+1
+
+print("[RO, E1, E2, CHA, SLC, REP ]: ", eNx, eNy  , eNz , number_of_channels, number_of_slices, number_of_repetitions)
+```
+
+Then we do the allocation usign numpy
+
+```python
+mybuffer=np.zeros(( int(eNx),int(eNy), int(eNz), int(number_of_channels)),dtype=np.complex64)
+```
+
+Then in the loop, get the encoding index and compare the size of the buffer and the readout:
+
+```
+e1=acquisition.idx.kspace_encode_step_1
+e2=acquisition.idx.kspace_encode_step_2
+slice = acquisition.idx.slice
+repetition=  acquisition.idx.repetition   
+
+print(np.shape(acquisition.data))
+print(np.shape(mybuffer[:,e1,e2,:])) 
+```
+
+There is an oversampling in readout direction by a factor of 2 in all Siemens acquisition.
+Use `np.transpose` to copy and paste the data
+
 
 ### First Conclusion
 
-Pas forcément nécessaire de tout redévelopper
-
-Il existe de nombreux gadgets en python et/ou en C++ qui permettent d'aller plus vite.
-
- 
-TODO: installation sans GPU / avec GPU
-      docker avec/sans Python / Matlab
-
-
-
-
-
-
-
-
-
-
+This conclude the lecure on readout. Note that basic kspace processing step have already been developped in python or in C++.
+There is no need to redoo it except for educational purpose. Call them in xml.
 
 
 ## A brief description of the class used to store readout, kspace or image data
@@ -399,9 +468,9 @@ print(type(data))
 
 ### Kspace
 
-En imagerie cartesienne, deux gadgets jouent un role fondamental : AcquisitionAccumulateTriggerGadget et BucketToBufferGadget. 
+In cartesian sampling, two gadgets play a fundamental role : AcquisitionAccumulateTriggerGadget and BucketToBufferGadget. 
 
-Ces gadgets servent à bufferiser les readouts afin de construire le kspace. En IRM, les dimensionalités sont très nombreuses: 
+These gadgets are used to buffer readouts in order to build the kspace. In MRI, the dimensions are very numerous:: 
 
 * kx (RO)
 * ky (E1)
@@ -415,124 +484,237 @@ Ces gadgets servent à bufferiser les readouts afin de construire le kspace. En 
 * set
 * slice (SLC)
 * ...
+ 
+By convention, in input the matrix size is [RO, CHA] and in output is [RO E1 E2 CHA N S SLC].
+The dimensions **N** and **S** are chosen by the user. 
 
-Par convention, nous aurons en entrée des matrices de dimentions [RO, CHA] et en sortie de BucketToBufferGadget des matrices de dimensions [RO E1 E2 CHA N S SLC].
-Les dimensions **N** et **S** peuvent être choisie arbitrairement par l'utilisateur. 
-
-Il est fort interessant de se positionner après ces gadgets ou sont automatiquement triés les données kspaces, que ce soit les lignes de calibration en imagerie parallèle ou les lignes sous échantionnées.  
+It is very interesting to position yourself after these gadgets where the kspaces data are automatically sorted, whether it is the calibration lines in parallel imaging or the lines sampled.   
 
 
-Les données de calibration si elles sont présentes sont accessibles via la structure suivante:
+The calibration data if present is accessible via the following structure:
 
 ```
 buffer.ref.data  
 buffer.ref.header
 ```
 
-Les données "standard" sont accessibles via la structure suivante:
+The fullysampled or undersampled data are accessible via the following structure:
 
 ```
 buffer.data.data
 buffer.data.header
 ```
 
-Attention, la taille des headers est associée la taille des données, les headers sont généralement différents, par ex la position des coupes changent suivant la direction SLC.
-Nous avons donc maintenant une matrice hondarray de acquisitionheader de dimensions [E1 E2 N S SLC]. Les headers étant identique suivant la direction de readout et pour tous les éléments d'antennes.
+Be cautious, the size of the headers is associated with the size of the data. Between them the headers are generally different, for example the position of the slicess change according to the SLC direction. We now have a hoNDarray acquisitionHeader with a matrix size of [E1 E2 N S SLC]. The headers being identical according to the direction of readout and for all channels.
 
  
-
-
-Le gadget python correspondant recevra un message qui contient une structure nommé **IsmrmrdReconBit** nommée IsmrmrdReconBit et IsmrmrdDataBuffered. Le gadget python doit donc contenir les includes suivants.   
-
-``` 
-from gadgetron import Gadget,IsmrmrdDataBuffered, IsmrmrdReconBit, SamplingLimit,SamplingDescription, IsmrmrdImageArray
-
-
-process(self, buffer):
-
-```
-
-Pour aller plus loin, voici les classes C++ correspondantes.
-
-
-
-```
-struct IsmrmrdReconBit
-  {
-  public:
-    IsmrmrdDataBuffered data_;
-    boost::optional<IsmrmrdDataBuffered> ref_;
-  }
-
-```
-
-```
-struct IsmrmrdDataBuffered
-  {
-  public:
-    //7D, fixed order [E0, E1, E2, CHA, N, S, LOC]
-    hoNDArray< std::complex<float> > data_;
-    
-    //7D, fixed order [TRAJ, E0, E1, E2, N, S, LOC]
-    boost::optional<hoNDArray<float>> trajectory_;
-
-    // 6D, density weights [E0, E1, E2, N, S, LOC]
-    boost::optional<hoNDArray<float> > density_;
-
-    //5D, fixed order [E1, E2, N, S, LOC]
-    hoNDArray< ISMRMRD::AcquisitionHeader > headers_;
-
-    SamplingDescription sampling_;
-   }
-
-```
-
-
 ### Image
 
 
 ### Writing the Buffered Gadget
 
-Nous allons donc maintenant créer un nouveau gadget nommé MyFirstDataBufferedGadget.
+Nous allons donc maintenant créer un nouveau gadget nommé `SimpleDataBufferedPythonGadget` dans un fichier appelé `my_first_buffered_data_gadget.py`
 
+`
 
-
-```python
-import sys
+```
+import numpy as np
+import gadgetron
 import ismrmrd
-import ismrmrd.xsd
+import logging
+import time
 
-from gadgetron import Gadget,IsmrmrdDataBuffered, IsmrmrdReconBit, SamplingLimit,SamplingDescription, IsmrmrdImageArray
+def SimplePythonGadget(connection):
+   logging.info("Python reconstruction running - reading readout data")
+   start = time.time()
+   counter=0
 
-class MyFirstDataBufferedGadget(Gadget):
-    def __init__(self,next_gadget=None):
-        super(MyFirstDataBufferedGadget,self).__init__(next_gadget=next_gadget)
-        self.my_value = 0
-        self.my_list = []
-	self.my_matrix =[]
+   for acquisition in connection:          
+        
+      
+       connection.send(acquisition)
 
-    def process_config(self, conf):
-        # do allocation        
-	pass 
+   logging.info(f"Python reconstruction done. Duration: {(time.time() - start):.2f} s")
+```
 
-    def process(self, message):
-               
-	# get information from the message
+And a new xml file named `external_python_buffer_tutorial.xml`
 
-	# modify the message
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <version>2</version>
 
-	# send the message to the next gadget
-        self.put_next(message)
-        return 0
+    <readers>
+        <reader>
+            <dll>gadgetron_core_readers</dll>
+            <classname>AcquisitionReader</classname>
+        </reader>
+        <reader>
+            <dll>gadgetron_core_readers</dll>
+            <classname>WaveformReader</classname>
+        </reader>
+    </readers>
 
+    <writers>
+        <writer>
+            <dll>gadgetron_core_writers</dll>
+            <classname>ImageWriter</classname>
+        </writer>
+    </writers>
+
+    <stream> 
+
+       <gadget>
+            <dll>gadgetron_mricore</dll>
+            <classname>NoiseAdjustGadget</classname>
+        </gadget>
+        
+          <!-- EPI correction -->
+     <gadget>
+        <name>ReconX</name>
+        <dll>gadgetron_epi</dll>
+        <classname>EPIReconXGadget</classname>
+     </gadget>
+
+     <gadget>
+        <name>EPICorr</name>
+        <dll>gadgetron_epi</dll>
+        <classname>EPICorrGadget</classname>
+     </gadget>
+
+     <gadget>
+        <name>FFTX</name>
+        <dll>gadgetron_epi</dll>
+        <classname>FFTXGadget</classname>
+     </gadget>
+
+     <gadget>
+        <name>OneEncodingSpace</name>
+        <dll>gadgetron_epi</dll>
+        <classname>OneEncodingGadget</classname>
+      </gadget>
+
+
+       <!-- Data accumulation and trigger gadget -->
+    <gadget>
+        <name>AccTrig</name>
+        <dll>gadgetron_mricore</dll>
+        <classname>AcquisitionAccumulateTriggerGadget</classname>
+        <property><name>trigger_dimension</name><value>repetition</value></property>
+        <property><name>sorting_dimension</name><value></value></property>
+    </gadget>
+
+      <gadget>
+        <name>BucketToBuffer</name>
+        <dll>gadgetron_mricore</dll>
+        <classname>BucketToBufferGadget</classname>
+        <property><name>N_dimension</name><value>contrast</value></property>
+        <property><name>S_dimension</name><value>average</value></property>
+        <property><name>split_slices</name><value>false</value></property>
+        <property><name>ignore_segment</name><value>true</value></property>
+     </gadget>
+
+        <external>
+            <execute name="my_first_data_buffered_python_gadget" target="SimpleDataBufferedPythonGadget" type="python"/>
+            <configuration/>
+        </external>
+ 
+    </stream>
+
+</configuration>
+```
+
+### Compilation 
+
+Nothing to do.
+
+### Reconstruction and visualisation
+
+To run the reconstruction chain, you'll need to run Gadgetron, and the Gadgetron ISMRMRD client in two different terminal located in the same folder.
+
+Start Gadgetron:
+```bash
+$ gadgetron
+```
+
+Run the ISMRMRD client: 
+```bash 
+$ gadgetron_ismrmrd_client -f Data/meas_MID00026_FID49092_cmrr_12s_80p_MB0_GP0.h5  -C external_python_tutorial.xml
+```
+
+You will see from the Gadgetron ISMRMRD client side :
+
+``` bash
+Gadgetron ISMRMRD client
+  -- host            :      localhost
+  -- port            :      9002
+  -- hdf5 file  in   :      /home/valery/DICOM/2017-09-14_IBIO/meas_MID00026_FID49092_cmrr_12s_80p_MB0_GP0.h5
+  -- hdf5 group in   :      /dataset
+  -- conf            :      default.xml
+  -- loop            :      1
+  -- hdf5 file out   :      out.h5
+  -- hdf5 group out  :      2020-05-19 15:44:55
+This measurement has dependent measurements
+  Noise : 16
+Querying the Gadgetron instance for the dependent measurement: 66056_63650129_63650134_16
 ```
 
 
-### Compilation, Installation and launching the reco
+You will see from the Gadgetron server side :
+
+```bash
+[...]
+
+```
+
 ### Exercice 1: Fourier Transform using imsmrmrd-python-tool
-### [Exercice 2: Fourier Transform using BART
+
+
+```python
+import matplotlib.pyplot as plt
+from ismrmrdtools import show, transform
+```
+
+```python
+for acquisition in connection:
+      
+       #acquisition is a vector of a specific structure, we called reconBit 
+       #print(type(acquisition[0]))
+
+       for reconBit in acquisition:
+
+           print(type(reconBit))
+           # reconBit.ref is the calibration for parallel imaging
+           # reconBit.data is the undersampled dataset
+           print('-----------------------')
+	   # each of them include a specific header and the kspace data
+           print(type(reconBit.data.headers))
+           print(type(reconBit.data.data))
+
+           print(reconBit.data.headers.shape)
+           print(reconBit.data.data.shape)
+           
+           repetition=reconBit.data.headers.flat[34].idx.repetition 
+           print(repetition)
+```
+
+we could set alternative names for acquisition and reconBit but then data, ref and data and headers are fixed and refered to a specific class.
+
+```python
+for lala in connection
+  for lili in lala
+      #use
+      lili.ref.headers
+      lili.ref.data
+      lili.data.headers
+      lili.data.data
+      
+```
+
+### Exercice 2: Fourier Transform using BART
 ### Exercice 3: Fourier Transform using Sigpy
 ### Exercice 4: Grappa reconstruction using PyGrappa
+
 
 
 
