@@ -1,4 +1,4 @@
-# Lecture 3 : Basic reconstruction using Python (Part1)
+# Lecture 3 : Basic reconstruction using Python (1/3)
 
 Title : Basic reconstruction using Python
 
@@ -51,7 +51,7 @@ sudo apt-get install gadgetron-all
 sudo pip3 install gadgetron
 ```
 
-(Optional) The following toolbixes will be used at the end of the tutorial. You can skip this part at the beginning.
+(Optional) The following toolboxes will be used at the end of the tutorial. You can skip this part at the beginning.
 
 * [ismrmrd-python-tools](https://github.com/ismrmrd/ismrmrd-python-tools)
 * [sigpy](https://github.com/mikgroup/sigpy-mri-tutorial)
@@ -60,15 +60,13 @@ sudo pip3 install gadgetron
 * [ismrmrd-viewer](https://github.com/DietrichBE/ismrmrd-viewer)  (an alternative)
 * [BART](https://github.com/mrirecon/bart)
 
-You can install them using `pip3 install` or using the command `python3 setup.py install` after downloading the source or `make` for BART. Nevertheless somes dependencies must be satisfied. Some ex
+You can install them using `pip3 install` or using the command `python3 setup.py install` after downloading the source or `make` for BART as follow. Nevertheless somes dependencies must be satisfied.
 
 ```
 git clone https://github.com/ismrmrd/ismrmrd-python-tools.git
 cd ismrmrd-python-tools
 sudo python3 setup.py install
-```   
 
-```
 sudo pip3 install pygrappa
 sudo pip3 install sigpy
 ```
@@ -85,7 +83,7 @@ Three datasets (including noise calibration and kspace) are available:
 - phantom, 12 slices, 3 repetitions, in-plane acceleration 2, slice acceleration none  
 - brain, 36 slices, 3 repetitions, in-plane acceleration 2, slice acceleration 2 
 
-The data has been converted using **siemens_to_ismrmrd**, we will not discuss data conversion here. This will be the object of the following readings.
+The data has been converted using **siemens_to_ismrmrd**, we will not discuss data conversion here. This will be the topics of the next lectures.
 
 ## Objectives
 
@@ -93,9 +91,9 @@ The data has been converted using **siemens_to_ismrmrd**, we will not discuss da
 - to create a new xml configuration file 
 - data manipulation (readout, kspace, image)
 - to become familiar with the Cartesian reconstruction pipeline
-- to call BART from a python gagdet
-- to call SigPy from a python gagdet
-- to call pygrappa from a python gagdet
+- to call BART from a Python gagdet
+- to call SigPy from a Python gagdet
+- to call pygrappa from a Python gagdet
 
 ## A typical Python Gadget
 
@@ -131,7 +129,7 @@ cd GT_Lecture3
 Create the file my_first_python_gadget.py then copy the previous class. 
 
 ```
-We can add the following message before connection.send() that we are going through it.
+We can add the following text before connection.send() that we are going through it.
 print("so far, so good")
 ```
 
@@ -423,8 +421,7 @@ Use `np.transpose` to copy and paste the data
 
 ### First Conclusion
 
-This conclude the lecure on readout. Note that standard kspace processing step have already been developped in python or in C++.
-There is no need to redoo it except for educational purpose. Call them in xml.
+This conclude the lecure on readout. Note that standard kspace processing step (removeOversampling, ghost niquist and BO corrections for EPI, coil compression...) have already been developped in python or in C++. There is no need to redoo it except for educational purpose. 
 
 
 

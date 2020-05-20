@@ -1,4 +1,4 @@
-# Lecture 3 : Basic reconstruction using Python (Part2)
+# Lecture 3 : Basic reconstruction using Python (2/3)
 
 Title : Basic reconstruction using Python
 
@@ -279,7 +279,7 @@ for acquisition in connection:
            print(repetition)
 ```
 
-we could set alternative names for acquisition and reconBit but then data, ref and data and headers are fixed and refered to a specific class.
+we could set alternative names for acquisition and reconBit but data, ref and data and headers are fixed and refered to a specific class.
 
 ```python
 for lala in connection
@@ -292,11 +292,141 @@ for lala in connection
       
 ```
 
+Now, let's do the 2D IFFT using the transform function from ismrmrdtools. It is calling numpy.ifft and numpy.iff_shift.
+
+```
+im = transform.transform_kspace_to_image(reconBit.data.data, [0,1])
+``
+
+Let's plot the result at each repetition for channel 0 and slice 0
+
+```
+plt.subplot(121)
+plt.imshow(np.abs(np.squeeze(reconBit.data.data[:,:,0,0,0,0,0])))
+plt.subplot(122)
+plt.imshow(np.abs(np.squeeze(im[:,:,0,0,0,0,0])))
+```
+
+
 ### Exercice 2: Fourier Transform using BART
+
+Add the following lines in our ~/.bashrc
+
+```
+export BART_DIR=/home/valery/Dev/bart
+export TOOLBOX_PATH=${BART_DIR}
+export PATH=${TOOLBOX_PATH}:${PATH}
+
+```
+
+
+```
+#BART import
+import os
+import sys
+path = os.environ["TOOLBOX_PATH"] + "/python/";
+sys.path.append(path);
+from bart import bart
+import cfl
+```
+
+In order to do a simple fft, add the following lines
+
+```python
+try:
+   print("calling BART")              
+   im=bart(1, 'fft -iu 7',  reconBit.data.data)
+except:
+   print("issue with BART")
+
+```
+ 
 ### Exercice 3: Fourier Transform using Sigpy
+
+```python
+#SigPy import
+import sigpy as sp
+import sigpy.mri as mr
+import sigpy.plot as pl
+```
+
+In order to do a simple fft, add the following lines
+
+```python
+dims=reconBit.data.data.shape
+im=np.zeros(dims, reconBit.data.data.dtype)
+for slc in range(0, dims[6]):
+  for s in range(0, dims[5]):
+      for n in range(0, dims[4]):
+          kspace=reconBit.data.data[:,:,:,:,n,s,slc]
+          # tranpose from [RO E1 E2 CHA] to [CHA E2 E1 RO]
+          ksp=np.transpose(kspace, (3, 2 , 1, 0))                    
+          print(ksp.shape)
+          F = sp.linop.FFT(ksp.shape, axes=(-1, -2))
+          I=F.H * ksp
+          im[:,:,:,:,n,s,slc]=np.transpose(I, (3, 2 , 1, 0))
+
+```
+
 ### Exercice 4: Grappa reconstruction using PyGrappa
 
+```python
+#pygrappa import
+from pygrappa import grappa
+```
+
+we must catch the reference data or ACS calibration using the following line
+```
+reference=[] # outside the loop
+
+try: 
+   if reconBit.ref.data is not None:
+     print("reference data exist")            
+     np.save('/tmp/gadgetron/reference', reconBit.ref.data)
+     reference=reconBit.ref.data
+   else:
+     print("reference data not exist")
+except:
+     print("issue with reference data")
+```
 
 
+```
+# size of the undersampled dataset
+dims=reconBit.data.data.shape
+# the reco is done on a 3D dataset[RO,E1,CHA], some loops are necessary 
+# to catch and put back the data after the reco
+kspace_data_tmp=np.zeros(dims, reconBit.data.data.dtype)
+for slc in range(0, dims[6]):
+     for n in range(0, dims[5]):
+         for s in range(0, dims[4]):
+        
+             kspace=reconBit.data.data[:,:,:,:,s,n,slc]
+             calib=reference[:,:,:,:,s,n,slc]        
+                
+             calib=np.squeeze(calib,axis=2)
+             kspace=np.squeeze(kspace,axis=2)
+               
+             sx, sy,  ncoils = kspace.shape[:]
+             cx, cy,  ncoils = calib.shape[:]
 
+             # Here's the actual reconstruction
+             res = grappa(kspace, calib, kernel_size=(5, 5), coil_axis=-1)
+
+             # Here's the resulting shape of the reconstruction.  The coil
+             # axis will end up in the same place you provided it in
+             sx, sy, ncoils = res.shape[:]                
+             kspace_data_tmp[:,:,0,:,s,n,slc]=res
+
+        
+# ifft, this is necessary for the next gadget in the standard cartesian chain     
+im = transform.transform_kspace_to_image(kspace_data_tmp,dim=(0,1,2))
+```
+
+## Second conclusion
+
+This conclude the lecture on kspace. Before sending the data to the MRI. You need to fill some fields in ImageHeader, that are not currently working in Python.
+Such field are really important at the scanner side to load correctly the volumes, to send back multiple volumes from a single acquisition, and to set them as a specific role like T1_map. Complete integration of you reco with Siemens post-processing tools can be achieved leading to a fully transparent reco from user perspective.
+You can also tag the data as a GT reco for the history !
+ 
 
