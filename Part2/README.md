@@ -27,14 +27,9 @@ Speaker: Valéry Ozenne
 
 ## 
 
-As already mentionned Gadgetron is really powerfull for in-line prototyping and clinical integration. 
-Gadgetron included many toolbox with many operators (partialDerivativeOperator, laplaceOperator, encodingOperatorContainer), linear solver (Conjugate Gradient, ...), non-linear solver (Split Bregman Solver, ...). Implementation on CPU and GPU are available for having the best performance. Such tools are usefull to solve the inverse problem, even if C++ integration can be scary at first glance... Popular libraires are avaible in other language that ca be easily incorporated into the gadgetron chain.
+Gadgetron is really powerfull for in-line prototyping and clinical integration. Gadgetron included many toolboxes (that will be presented in C++ lectures) with operators (partialDerivativeOperator, laplaceOperator, encodingOperatorContainer), linear solver (Conjugate Gradient, ...), non-linear solver (Split Bregman Solver, ...). Implementation on CPU and GPU are available and usually offer good performance. Such tools are common to solve the inverse problem, but the C++ implementation can be long and scary at first try... Popular libraires are avaible in other language and can be easily incorporated into the gadgetron chain. The objectives of the second part is to present how to integrate MRI libraries into the reconstruction chain. As an example, a CS MP2RAGE with acceleration of ~8 was reconstructed in-line using the Gadgetron and BART and send back to 3T MRI. The slides are available at this link [Gadgetron_Bart_T1_demo, ISMRM 2019](https://github.com/NHLBI-MR/ISMRM2019_demo/tree/master/Gadgetron_Bart_T1_demo)
 
-
-![A CS MP2RAGE was reconstructed in-line using the Gadgetron and BART and send back to 3T MRI. Aurélien Trotier, Valéry Ozenne, ISMRM 2019](cs_mp2rage_gt_bart_siemens.png "GT+ BART")
-
-
-
+![](cs_mp2rage_gt_bart_siemens.png "GT+ BART")
 
 ## A brief description of the class used to store readout, kspace or image data
 
