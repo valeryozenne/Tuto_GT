@@ -8,6 +8,7 @@ Speaker: Valéry Ozenne
 
 ## Summary
 
+ - [Foreword](#foreword)
  - [A brief description of the class used to store readout, kspace or image data](#a-brief-description-of-the-class-used-to-store-readout-kspace-or-image-data)
     - [Readout](#readout)
     - [Kspace](#kspace)
@@ -19,8 +20,20 @@ Speaker: Valéry Ozenne
     - [Reconstruction and visualisation]
     - [Exercice 1: Fourier Transform using ismrmrd-python-tool](#exercice-1-fourier-transform-using-ismrmrd-python-tool)
     - [Exercice 2: Fourier Transform using SigPy](#exercice-2-fourier-transform-using-sigpy)
-    - [Exercice 3: Fourier Transform using BART](#liens)
+    - [Exercice 3: Fourier Transform using BART](#exercice-3-fourier-transform-using-bart)
     - [Exercice 4: Grappa reconstruction using PyGrappa](#exercice-4-grappa-reconstruction-using-pygrappa)
+
+
+
+## 
+
+As already mentionned Gadgetron is really powerfull for in-line prototyping and clinical integration. 
+Gadgetron included many toolbox with many operators (partialDerivativeOperator, laplaceOperator, encodingOperatorContainer), linear solver (Conjugate Gradient, ...), non-linear solver (Split Bregman Solver, ...). Implementation on CPU and GPU are available for having the best performance. Such tools are usefull to solve the inverse problem, even if C++ integration can be scary at first glance... Popular libraires are avaible in other language that ca be easily incorporated into the gadgetron chain.
+
+
+![A CS MP2RAGE was reconstructed in-line using the Gadgetron and BART and send back to 3T MRI. Aurélien Trotier, Valéry Ozenne, ISMRM 2019](cs_mp2rage_gt_bart_siemens.png "GT+ BART")
+
+
 
 
 ## A brief description of the class used to store readout, kspace or image data
@@ -313,7 +326,7 @@ plt.imshow(np.abs(np.squeeze(im[:,:,0,0,0,0,0])))
 
 
  
-### Exercice 3: Fourier Transform using Sigpy
+### Exercice 2: Fourier Transform using Sigpy
 
 "SigPy is a package for signal processing, with emphasis on iterative methods. It is built to operate directly on NumPy arrays on CPU and CuPy arrays on GPU. SigPy also provides several domain-specific submodules: sigpy.plot for multi-dimensional array plotting, sigpy.mri for MRI iterative reconstruction, and sigpy.learn for dictionary learning." (extract from [sigpy.readthedocs](https://sigpy.readthedocs.io/en/latest/)
 
@@ -356,7 +369,11 @@ for slc in range(0, dims[6]):
 
 ### Exercice 3: Fourier Transform using BART
 
-Add the following lines in our ~/.bashrc
+The Berkeley Advanced Reconstruction Toolbox (BART) toolbox is a free and open-source image-reconstruction framework for Computational Magnetic Resonance Imaging developed by the research groups of Martin Uecker (Göttingen University), Jon Tamir (UT Austin), and Michael Lustig (UC Berkeley). It consists of a programming library and a toolbox of command-line programs. The library provides common operations on multi-dimensional arrays, Fourier and wavelet transforms, as well as generic implementations of iterative optimization algorithms. The command-line tools provide direct access to basic operations on multi-dimensional arrays as well as efficient implementations of many calibration and reconstruction algorithms for parallel imaging and compressed sensing. (extract from [mrirecon.github.io](https://mrirecon.github.io/bart/)
+
+BART is easy to use, pics is magic, and tutorial are available here [bart-workshop](https://github.com/mrirecon/bart-workshop)
+
+Don't forget to add the following lines in our ~/.bashrc
 
 ```bash
 export BART_DIR=/home/valery/Dev/bart
