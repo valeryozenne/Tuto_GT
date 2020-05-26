@@ -8,15 +8,17 @@ Speaker: Valéry Ozenne
 
 ## Summary
 
- - [A brief description of the class used to store readout, kspace or image data](#)
-    - [Readout](#les-issues)
-    - [Kspace](#faq)
-    - [Image](#liens)
- - [My First Data Buffered Gadget](#glossaire)
-    - [Writing the Buffered Gadget](#les-issues)
+ - [A brief description of the class used to store readout, kspace or image data](#a-brief-description-of-the-class-used-to-store-readout-kspace-or-image-data)
+    - [Readout](#readout)
+    - [Kspace](#kspace)
+    - [Image](#image)
+ - [My First Data Buffered Gadget](#writing-the-buffered-gadget)
+    - [Writing the Buffered Gadget](#writing-the-buffered-gadget)
+    - [Writing the XML](#les-issues)
     - [Compilation](#faq)
-    - [Exercice 1: Fourier Transform using imsmrmrd-python-tool](#liens)
-    - [Exercice 2: Fourier Transform using Sigpy](#liens)
+    - [Reconstruction and visualisation]
+    - [Exercice 1: Fourier Transform using imsmrmrd-python-tool](#exercice-1-fourier-transform-using-imsmrmrd-python-tool)
+    - [Exercice 2: Fourier Transform using SigPy](#exercice-3-fourier-transform-using-sigpy)
     - [Exercice 3: Fourier Transform using BART](#liens)
     - [Exercice 4: Grappa reconstruction using PyGrappa](#liens)
 
@@ -92,6 +94,8 @@ Be cautious, the size of the headers is associated with the size of the data. Be
 ### Image
 
 
+## My First Data Buffered Gadget
+
 ### Writing the Buffered Gadget
 
 Nous allons donc maintenant créer un nouveau gadget nommé `SimpleDataBufferedPythonGadget` dans un fichier appelé `my_first_buffered_data_gadget.py`
@@ -117,6 +121,8 @@ def SimplePythonGadget(connection):
 
    logging.info(f"Python reconstruction done. Duration: {(time.time() - start):.2f} s")
 ```
+
+### Writing the XML
 
 And a new xml file named `external_python_buffer_tutorial.xml`
 
@@ -343,6 +349,16 @@ except:
  
 ### Exercice 3: Fourier Transform using Sigpy
 
+"SigPy is a package for signal processing, with emphasis on iterative methods. It is built to operate directly on NumPy arrays on CPU and CuPy arrays on GPU. SigPy also provides several domain-specific submodules: sigpy.plot for multi-dimensional array plotting, sigpy.mri for MRI iterative reconstruction, and sigpy.learn for dictionary learning." (extract from [sigpy.readthedocs](https://sigpy.readthedocs.io/en/latest/)
+
+Sigpy offer an elegant way of solving the inverse problem in MRI reconstruction. The code is as close as possible to the mathematical formula. You pick a formula and some data, built the oeprators and chose a regulation and that's it. Some examples are available here [link](https://github.com/mikgroup/sigpy-mri-tutorial/):  
+
+Here, we will just perfomed the inverse fourier transform by calling the adjoint of the FFT operator (<a href="https://www.codecogs.com/eqnedit.php?latex=F^{-1}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?F^{-1}" title="F^{-1}" /></a>)
+
+In the following example, even if it is not necessary, a loop over the last dimension (N,S,SLC) is performed to apply the ifft only on a 4D array [RO, E1, E2, CHA].
+Be careful, the input of SigPy is starting with the channel but I'm not sure if I should input by convention [CHA,RO,E1,E2] or [CHA, E2, E1, RO].  In the following case, I used [CHA, E2, E1, RO]  on a 2D dataset, so the FFT operator apply only on the last two dimensions. Anyway, np.transpose is therefore usefull twice.
+
+
 ```python
 #SigPy import
 import sigpy as sp
@@ -362,8 +378,11 @@ for slc in range(0, dims[6]):
           # tranpose from [RO E1 E2 CHA] to [CHA E2 E1 RO]
           ksp=np.transpose(kspace, (3, 2 , 1, 0))                    
           print(ksp.shape)
+          # definition of the FFT operator only on the last two dimensions.
           F = sp.linop.FFT(ksp.shape, axes=(-1, -2))
+          # F.H is the inverse of F 
           I=F.H * ksp
+          #  
           im[:,:,:,:,n,s,slc]=np.transpose(I, (3, 2 , 1, 0))
 
 ```
