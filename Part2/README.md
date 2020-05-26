@@ -12,15 +12,15 @@ Speaker: Valéry Ozenne
     - [Readout](#readout)
     - [Kspace](#kspace)
     - [Image](#image)
- - [My First Data Buffered Gadget](#writing-the-buffered-gadget)
+ - [My First Data Buffered Gadget](#my-first-data-buffered-gadget)
     - [Writing the Buffered Gadget](#writing-the-buffered-gadget)
     - [Writing the XML](#les-issues)
     - [Compilation](#faq)
     - [Reconstruction and visualisation]
-    - [Exercice 1: Fourier Transform using imsmrmrd-python-tool](#exercice-1-fourier-transform-using-imsmrmrd-python-tool)
-    - [Exercice 2: Fourier Transform using SigPy](#exercice-3-fourier-transform-using-sigpy)
+    - [Exercice 1: Fourier Transform using ismrmrd-python-tool](#exercice-1-fourier-transform-using-ismrmrd-python-tool)
+    - [Exercice 2: Fourier Transform using SigPy](#exercice-2-fourier-transform-using-sigpy)
     - [Exercice 3: Fourier Transform using BART](#liens)
-    - [Exercice 4: Grappa reconstruction using PyGrappa](#liens)
+    - [Exercice 4: Grappa reconstruction using PyGrappa](#exercice-4-grappa-reconstruction-using-pygrappa)
 
 
 ## A brief description of the class used to store readout, kspace or image data
@@ -99,8 +99,6 @@ Be cautious, the size of the headers is associated with the size of the data. Be
 ### Writing the Buffered Gadget
 
 Nous allons donc maintenant créer un nouveau gadget nommé `SimpleDataBufferedPythonGadget` dans un fichier appelé `my_first_buffered_data_gadget.py`
-
-`
 
 ```
 import numpy as np
@@ -254,7 +252,7 @@ You will see from the Gadgetron server side :
 
 ```
 
-### Exercice 1: Fourier Transform using imsmrmrd-python-tool
+### Exercice 1: Fourier Transform using ismrmrd-python-tool
 
 
 ```python
@@ -314,38 +312,6 @@ plt.imshow(np.abs(np.squeeze(im[:,:,0,0,0,0,0])))
 ```
 
 
-### Exercice 2: Fourier Transform using BART
-
-Add the following lines in our ~/.bashrc
-
-```
-export BART_DIR=/home/valery/Dev/bart
-export TOOLBOX_PATH=${BART_DIR}
-export PATH=${TOOLBOX_PATH}:${PATH}
-
-```
-
-
-```
-#BART import
-import os
-import sys
-path = os.environ["TOOLBOX_PATH"] + "/python/";
-sys.path.append(path);
-from bart import bart
-import cfl
-```
-
-In order to do a simple fft, add the following lines
-
-```python
-try:
-   print("calling BART")              
-   im=bart(1, 'fft -iu 7',  reconBit.data.data)
-except:
-   print("issue with BART")
-
-```
  
 ### Exercice 3: Fourier Transform using Sigpy
 
@@ -386,6 +352,42 @@ for slc in range(0, dims[6]):
           im[:,:,:,:,n,s,slc]=np.transpose(I, (3, 2 , 1, 0))
 
 ```
+
+
+### Exercice 3: Fourier Transform using BART
+
+Add the following lines in our ~/.bashrc
+
+```bash
+export BART_DIR=/home/valery/Dev/bart
+export TOOLBOX_PATH=${BART_DIR}
+export PATH=${TOOLBOX_PATH}:${PATH}
+
+```
+
+
+```python
+#BART import
+import os
+import sys
+path = os.environ["TOOLBOX_PATH"] + "/python/";
+sys.path.append(path);
+from bart import bart
+import cfl
+```
+
+In order to do a simple fft, add the following lines
+
+```python
+try:
+   print("calling BART")              
+   im=bart(1, 'fft -iu 7',  reconBit.data.data)
+except:
+   print("issue with BART")
+
+```
+
+
 
 ### Exercice 4: Grappa reconstruction using PyGrappa
 
