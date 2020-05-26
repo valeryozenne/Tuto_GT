@@ -300,7 +300,7 @@ Now, let's do the 2D IFFT using the transform function from ismrmrdtools. It is 
 
 ```
 im = transform.transform_kspace_to_image(reconBit.data.data, [0,1])
-``
+```
 
 Let's plot the result at each repetition for channel 0 and slice 0
 
