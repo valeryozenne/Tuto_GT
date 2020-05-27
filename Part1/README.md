@@ -126,7 +126,7 @@ mkdir GT_Lecture3
 cd GT_Lecture3
 ```
 
-Create the file my_first_python_gadget.py then copy the previous class. 
+Create the file my_first_python_gadget.py then copy the previous function. 
 
 ```
 We can add the following text before connection.send() that we are going through it.

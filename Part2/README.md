@@ -17,7 +17,7 @@ Speaker: Valéry Ozenne
     - [Writing the Buffered Gadget](#writing-the-buffered-gadget)
     - [Writing the XML](#les-issues)
     - [Compilation](#faq)
-    - [Reconstruction and visualisation]
+    - [Reconstruction and visualisation](#reconstruction-and-visualisation)
     - [Exercice 1: Fourier Transform using ismrmrd-python-tool](#exercice-1-fourier-transform-using-ismrmrd-python-tool)
     - [Exercice 2: Fourier Transform using SigPy](#exercice-2-fourier-transform-using-sigpy)
     - [Exercice 3: Fourier Transform using BART](#exercice-3-fourier-transform-using-bart)
@@ -45,18 +45,13 @@ Each of them are defined in a C++ and have equivalent in Python. Additionnal str
 
 ### Readout
 
-Le gadget python recevra deux messages associés qui contiennent le **AcquisitionHeader** et les données sous forme de matrice **hoNDArray< std::complex<float> >**.
-En python le **hoNDArray** est la matrice multidimensionnel **ndarray** issue de la librairie numpy 
+In C++ , the python gadget will receive two messages which contain the **AcquisitionHeader** and the data in a matrix **hoNDArray< std::complex<float> >**.
+In Python, as presented before, we receive a structure including both the data in a **ndarray** from numpy and the fields from the **AcquisitionHeader**
 
 ``` 
-process(self, header, data):
-
-```
-
-```
-print(type(header))
-
-print(type(data))
+for acquisition in connection:
+   print(acquisition.scan_counter)
+   print(np.shape(acquisition.data))
 ```
 
 ### Kspace
@@ -103,12 +98,13 @@ Be cautious, the size of the headers is associated with the size of the data. Be
  
 ### Image
 
+TODO 
 
 ## My First Data Buffered Gadget
 
 ### Writing the Buffered Gadget
 
-Nous allons donc maintenant créer un nouveau gadget nommé `SimpleDataBufferedPythonGadget` dans un fichier appelé `my_first_buffered_data_gadget.py`
+Create the file `my_first_buffered_data_gadget.py`  then copy the following function. You can call it `SimpleDataBufferedPythonGadget`
 
 ```
 import numpy as np
@@ -132,7 +128,7 @@ def SimplePythonGadget(connection):
 
 ### Writing the XML
 
-And a new xml file named `external_python_buffer_tutorial.xml`
+We will now create a new xml file named `external_python_buffer_tutorial.xml`
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -405,6 +401,15 @@ except:
 
 ### Exercice 4: Grappa reconstruction using PyGrappa
 
+"GRAPPA is a popular parallel imaging reconstruction algorithm. Unfortunately there aren’t a lot of easy to use Python implementations of it or its many variants available, so I decided to release this simple package.
+
+There are also a couple reference SENSE-like implementations that have made their way into the package. This is to be expected – a lot of later parallel imaging algorithms have hints of both GRAPPA- and SENSE-like inspirations." (extract from [pygrappa.readthedocs](https://pygrappa.readthedocs.io/en/latest/)
+
+The sequence play the ACS in separate mode in other word the ACS are played only once at the first repetition.
+We need to do the calibration once and to buffer the result and apply them for each incomping undersampled kspace at each repetition.
+The calibration is stored for each N,S,SLC, dimensions using a loop  
+
+
 ```python
 #pygrappa import
 from pygrappa import grappa
@@ -422,14 +427,15 @@ try:
    else:
      print("reference data not exist")
 except:
-     print("issue with reference data")
+     print("issue the reference data, this normal if the repetition number is higher than 0")
+      
 ```
 
 
 ```
 # size of the undersampled dataset
 dims=reconBit.data.data.shape
-# the reco is done on a 3D dataset[RO,E1,CHA], some loops are necessary 
+# the reco is done on a 3D dataset [RO,E1,CHA], some loops are necessary 
 # to catch and put back the data after the reco
 kspace_data_tmp=np.zeros(dims, reconBit.data.data.dtype)
 for slc in range(0, dims[6]):
@@ -461,7 +467,7 @@ im = transform.transform_kspace_to_image(kspace_data_tmp,dim=(0,1,2))
 ## Second conclusion
 
 This conclude the lecture on kspace. Before sending the data to the MRI. You need to fill some fields in ImageHeader, that are not currently working in Python.
-Such field are really important at the scanner side to load correctly the volumes, to send back multiple volumes from a single acquisition, and to set them as a specific role like T1_map. Complete integration of you reco with Siemens post-processing tools can be achieved leading to a fully transparent reco from user perspective.
+Such field are really important at the scanner side to load correctly the volumes, to send back multiple volumes from a single acquisition, and to set them as a specific role like T1_map as in the example. Complete integration of you reco with Siemens post-processing tools can be achieved leading to a fully transparent reco from user perspective.
 You can also tag the data as a GT reco for the history !
  
 
