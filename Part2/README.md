@@ -25,7 +25,7 @@ Speaker: Valéry Ozenne
 
 
 
-## 
+## Foreword
 
 Gadgetron is really powerfull for in-line prototyping and clinical integration. Gadgetron included many toolboxes (that will be presented in C++ lectures) with operators (partialDerivativeOperator, laplaceOperator, encodingOperatorContainer), linear solver (Conjugate Gradient, ...), non-linear solver (Split Bregman Solver, ...). Implementation on CPU and GPU are available and offer good/excellent performance. Such tools are common to solve the inverse problem, but the C++ implementation can be long and scary at first try... Popular libraires are avaible in other language and can be easily incorporated into the gadgetron chain. The objectives of the second part is to present how to integrate MRI libraries for compressed sensing, into the reconstruction chain. 
 
@@ -35,7 +35,7 @@ As an example below, a CS MP2RAGE with acceleration of 2.8 along Y and Z (~8 in 
 
 ## A brief description of the class used to store readout, kspace or image data
 
-The data structures in the gadgetron vary during reconstruction. It is important to differenciate, the class or common structures 
+The data structures in the Gadgetron vary during reconstruction. It is important to differenciate, the class or common structures 
 
 * used to store a unit of readout that would feed into a buffer
 * used to store a unit of data that would feed into a reconstruction
@@ -73,11 +73,10 @@ These gadgets are used to buffer readouts in order to build the kspace. In MRI, 
 * slice (SLC)
 * ...
  
-By convention, in input the matrix size is [RO, CHA] and in output is [RO E1 E2 CHA N S SLC].
+By convention, in input the matrix size is [RO, CHA] and in output is [RO, E1, E2, CHA, N, S, SLC].
 The dimensions **N** and **S** are chosen by the user. 
 
-It is very interesting to position yourself after these gadgets where the kspaces data are automatically sorted, whether it is the calibration lines in parallel imaging or the lines sampled.   
-
+It is very interesting to put your stuff after these gadgets. The kspace data are automatically sorted, whether it is the calibration lines in parallel imaging or the lines sampled, in presence of partial fourier, the lines are correctly positionned. Lot's things are automatically settle by the Gadgetron.  
 
 The calibration data if present is accessible via the following structure:
 
@@ -93,12 +92,12 @@ buffer.data.data
 buffer.data.header
 ```
 
-Be cautious, the size of the headers is associated with the size of the data. Between them the headers are generally different, for example the position of the slicess change according to the SLC direction. We now have a hoNDarray acquisitionHeader with a matrix size of [E1 E2 N S SLC]. The headers being identical according to the direction of readout and for all channels.
+Be cautious, the size of the headers is associated with the size of the data. Between them the headers are generally different, for example the position of the slicess change according to the SLC direction. We now have a hoNDarray acquisitionHeader with a matrix size of [E1, E2, N, S, SLC]. The headers being identical according to the direction of readout and for all channels.
 
  
 ### Image
 
-TODO 
+TODO
 
 ## My First Data Buffered Gadget
 
